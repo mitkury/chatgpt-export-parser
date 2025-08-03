@@ -2,7 +2,7 @@ import { describe, it, expect } from 'vitest';
 import { parseExport } from '../src/parser';
 import { getConversationMessages, buildMessageTree, identifyBranches } from '../src/parser';
 import { validateConversations } from '../src/schema';
-import { getTestArchivePath } from '../src/test-config';
+import { getTestArchivePath } from './test-config';
 import { MessageTree } from '../src/types';
 
 describe('parseExport', () => {
