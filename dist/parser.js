@@ -5,6 +5,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.parseExport = parseExport;
 const adm_zip_1 = __importDefault(require("adm-zip"));
+const schema_1 = require("./schema");
 async function parseExport(zipPath) {
     const zip = new adm_zip_1.default(zipPath);
     const zipEntries = zip.getEntries();
@@ -22,23 +23,28 @@ async function parseExport(zipPath) {
         throw new Error('conversations.json not found in export archive');
     }
     const conversationsData = conversationsEntry.getData().toString('utf-8');
-    const conversations = JSON.parse(conversationsData);
+    const rawConversations = JSON.parse(conversationsData);
+    const conversations = (0, schema_1.validateConversations)(rawConversations);
     // Parse other metadata files if they exist
     const userEntry = zip.getEntry('user.json');
     if (userEntry) {
-        metadata.user = JSON.parse(userEntry.getData().toString('utf-8'));
+        const rawUser = JSON.parse(userEntry.getData().toString('utf-8'));
+        metadata.user = (0, schema_1.validateUser)(rawUser);
     }
     const messageFeedbackEntry = zip.getEntry('message_feedback.json');
     if (messageFeedbackEntry) {
-        metadata.messageFeedback = JSON.parse(messageFeedbackEntry.getData().toString('utf-8'));
+        const rawFeedback = JSON.parse(messageFeedbackEntry.getData().toString('utf-8'));
+        metadata.messageFeedback = (0, schema_1.validateMessageFeedback)(rawFeedback);
     }
     const modelComparisonsEntry = zip.getEntry('model_comparisons.json');
     if (modelComparisonsEntry) {
-        metadata.modelComparisons = JSON.parse(modelComparisonsEntry.getData().toString('utf-8'));
+        const rawComparisons = JSON.parse(modelComparisonsEntry.getData().toString('utf-8'));
+        metadata.modelComparisons = (0, schema_1.validateModelComparisons)(rawComparisons);
     }
     const sharedConversationsEntry = zip.getEntry('shared_conversations.json');
     if (sharedConversationsEntry) {
-        metadata.sharedConversations = JSON.parse(sharedConversationsEntry.getData().toString('utf-8'));
+        const rawShared = JSON.parse(sharedConversationsEntry.getData().toString('utf-8'));
+        metadata.sharedConversations = (0, schema_1.validateSharedConversations)(rawShared);
     }
     // Parse each conversation
     const parsedConversations = conversations.map(parseConversation);
@@ -56,7 +62,7 @@ function parseConversation(conversation) {
         createTime: new Date(conversation.create_time * 1000),
         updateTime: new Date(conversation.update_time * 1000),
         messages,
-        isArchived: conversation.is_archived,
+        isArchived: conversation.is_archived ?? false,
         safeUrls: conversation.safe_urls
     };
 }

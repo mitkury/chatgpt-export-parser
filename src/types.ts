@@ -4,12 +4,12 @@ export interface ConversationExport {
   create_time: number;
   update_time: number;
   current_node: string;
-  is_archived: boolean;
-  moderation_results: any[];
+  is_archived?: boolean;
+  moderation_results: unknown[];
   mapping: Record<string, MessageNode>;
-  plugin_ids: string[] | null;
-  conversation_template_id: string | null;
-  gizmo_id: string | null;
+  plugin_ids?: string[] | null;
+  conversation_template_id?: string | null;
+  gizmo_id?: string | null;
   safe_urls: string[];
 }
 
@@ -24,20 +24,20 @@ export interface MessageContent {
   id: string;
   author: {
     role: "user" | "assistant" | "system" | "tool";
-    name: string | null;
-    metadata: Record<string, any>;
+    name: string | null | undefined;
+    metadata: Record<string, unknown>;
   };
   create_time: number;
-  update_time: number | null;
+  update_time: number | null | undefined;
   content: {
-    content_type: "text" | string;
-    parts: string[];
+    content_type: string;
+    parts?: string[];
   };
   status?: string;
-  end_turn: boolean | null;
-  weight: number;
-  metadata: Record<string, any>;
-  recipient: string;
+  end_turn: boolean | null | undefined;
+  weight?: number;
+  metadata: Record<string, unknown>;
+  recipient?: string;
 }
 
 export interface ParsedConversation {
