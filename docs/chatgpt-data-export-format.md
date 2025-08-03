@@ -1,5 +1,7 @@
 # ChatGPT Data Export Format and Parsing
 
+> **Note:** This document describes the ChatGPT export format. We have implemented a working parser in this repository that handles all the features described below. See the main README.md for usage examples.
+
 ## Export Archive Contents
 
 When you use **ChatGPT’s “Export Data”** feature, you receive a ZIP archive containing your entire chat history and related info in both HTML and JSON formats. The structure typically includes several files:

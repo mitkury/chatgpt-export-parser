@@ -1,6 +1,8 @@
-# ChatGPT Export Integration – Developer Spec
+# ChatGPT Export Integration – Developer Spec
 
-> **Goal** — Provide a reusable Node‑friendly package that ingests a user‑downloaded ChatGPT export ZIP, validates it with Zod, and exposes a clean runtime API **plus** an optional CLI.
+> **Note:** This document describes the planned Zod schema design. We have implemented working Zod schemas in `src/schema.ts` that validate ChatGPT exports at runtime.
+
+> **Goal** — Provide a reusable Node‑friendly package that ingests a user‑downloaded ChatGPT export ZIP, validates it with Zod, and exposes a clean runtime API **plus** an optional CLI.
 
 ---
 
