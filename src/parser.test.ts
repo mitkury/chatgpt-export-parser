@@ -1,11 +1,11 @@
 import { describe, it, expect } from 'vitest';
 import { parseExport } from './parser';
 import type { MessageTree } from './types';
-import * as path from 'path';
+import { getTestArchivePath } from './test-config';
 
 describe('parseExport', () => {
   it('should parse a ChatGPT export archive', async () => {
-    const zipPath = path.join(process.cwd(), 'data', 'chatgpt-august-2-2025.zip');
+    const zipPath = getTestArchivePath();
     
     const result = await parseExport(zipPath);
     
@@ -48,7 +48,7 @@ describe('parseExport', () => {
   });
 
   it('should handle conversations with system messages', async () => {
-    const zipPath = path.join(process.cwd(), 'data', 'chatgpt-august-2-2025.zip');
+    const zipPath = getTestArchivePath();
     const result = await parseExport(zipPath);
     
     // Find conversations with system messages
@@ -72,7 +72,7 @@ describe('parseExport', () => {
   });
 
   it('should handle conversations with safe URLs', async () => {
-    const zipPath = path.join(process.cwd(), 'data', 'chatgpt-august-2-2025.zip');
+    const zipPath = getTestArchivePath();
     const result = await parseExport(zipPath);
     
     // Find conversations with safe URLs
@@ -92,7 +92,7 @@ describe('parseExport', () => {
   });
 
   it('should handle archived conversations', async () => {
-    const zipPath = path.join(process.cwd(), 'data', 'chatgpt-august-2-2025.zip');
+    const zipPath = getTestArchivePath();
     const result = await parseExport(zipPath);
     
     // Find archived conversations
@@ -109,7 +109,7 @@ describe('parseExport', () => {
   });
 
   it('should handle conversations with tool messages', async () => {
-    const zipPath = path.join(process.cwd(), 'data', 'chatgpt-august-2-2025.zip');
+    const zipPath = getTestArchivePath();
     const result = await parseExport(zipPath);
     
     // Find conversations with tool messages (role: 'tool')
@@ -132,7 +132,7 @@ describe('parseExport', () => {
   });
 
   it('should handle messages with rich metadata', async () => {
-    const zipPath = path.join(process.cwd(), 'data', 'chatgpt-august-2-2025.zip');
+    const zipPath = getTestArchivePath();
     const result = await parseExport(zipPath);
     
     // Find messages with metadata
@@ -159,7 +159,7 @@ describe('parseExport', () => {
   });
 
   it('should handle long conversations', async () => {
-    const zipPath = path.join(process.cwd(), 'data', 'chatgpt-august-2-2025.zip');
+    const zipPath = getTestArchivePath();
     const result = await parseExport(zipPath);
     
     // Find long conversations (>100 messages)
@@ -183,7 +183,7 @@ describe('parseExport', () => {
   });
 
   it('should handle conversations with attachments', async () => {
-    const zipPath = path.join(process.cwd(), 'data', 'chatgpt-august-2-2025.zip');
+    const zipPath = getTestArchivePath();
     const result = await parseExport(zipPath);
     
     // Find messages that mention attachments in metadata
@@ -199,7 +199,7 @@ describe('parseExport', () => {
   });
 
   it('should preserve conversation timestamps correctly', async () => {
-    const zipPath = path.join(process.cwd(), 'data', 'chatgpt-august-2-2025.zip');
+    const zipPath = getTestArchivePath();
     const result = await parseExport(zipPath);
     
     result.conversations.forEach(conv => {
@@ -222,7 +222,7 @@ describe('parseExport', () => {
   });
 
   it('should handle conversations with different languages', async () => {
-    const zipPath = path.join(process.cwd(), 'data', 'chatgpt-august-2-2025.zip');
+    const zipPath = getTestArchivePath();
     const result = await parseExport(zipPath);
     
     // Find conversations with non-English content
@@ -250,7 +250,7 @@ describe('parseExport', () => {
   });
 
   it('should handle branched conversations correctly', async () => {
-    const zipPath = path.join(process.cwd(), 'data', 'chatgpt-august-2-2025.zip');
+    const zipPath = getTestArchivePath();
     
     const result = await parseExport(zipPath);
     
@@ -281,7 +281,7 @@ describe('parseExport', () => {
   });
 
   it('should properly identify and structure conversation branches', async () => {
-    const zipPath = path.join(process.cwd(), 'data', 'chatgpt-august-2-2025.zip');
+    const zipPath = getTestArchivePath();
     
     const result = await parseExport(zipPath);
     
@@ -330,7 +330,7 @@ describe('parseExport', () => {
   });
 
   it('should provide both flat messages and tree structure', async () => {
-    const zipPath = path.join(process.cwd(), 'data', 'chatgpt-august-2-2025.zip');
+    const zipPath = getTestArchivePath();
     
     const result = await parseExport(zipPath);
     

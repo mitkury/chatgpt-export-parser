@@ -1,9 +1,10 @@
 const { parseExport } = require('./dist/index.js');
+const { getTestArchivePath } = require('./dist/test-config.js');
 
 async function exploreConversations() {
   console.log('Exploring ChatGPT conversations...\n');
   
-  const data = await parseExport('./data/chatgpt-august-2-2025.zip');
+  const data = await parseExport(getTestArchivePath());
   
   console.log(`Total conversations: ${data.conversations.length}`);
   

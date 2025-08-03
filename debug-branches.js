@@ -1,9 +1,10 @@
 const { parseExport } = require('./dist/index.js');
+const { getTestArchivePath } = require('./dist/test-config.js');
 
 async function debugBranches() {
   console.log('Debugging branch structure...\n');
   
-  const data = await parseExport('./data/chatgpt-august-2-2025.zip');
+  const data = await parseExport(getTestArchivePath());
   
   // Look at the first conversation
   const firstConv = data.conversations[0];

@@ -1,9 +1,10 @@
 const { parseExport } = require('./dist/index.js');
+const { getTestArchivePath } = require('./dist/test-config.js');
 
 async function exploreBranches() {
   console.log('Exploring branched conversations...\n');
   
-  const data = await parseExport('./data/chatgpt-august-2-2025.zip');
+  const data = await parseExport(getTestArchivePath());
   
   // Sample a few conversations to examine their structure
   const samples = data.conversations.slice(0, 5);

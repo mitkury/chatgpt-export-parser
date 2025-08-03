@@ -1,9 +1,10 @@
 const { parseExport } = require('./dist/index.js');
+const { getTestArchivePath } = require('./dist/test-config.js');
 
 async function demonstrateTreeStructure() {
   console.log('Demonstrating tree structure for branched conversations...\n');
   
-  const data = await parseExport('./data/chatgpt-august-2-2025.zip');
+  const data = await parseExport(getTestArchivePath());
   
   // Find a conversation with branches
   const conversationWithBranches = data.conversations.find(conv => 
