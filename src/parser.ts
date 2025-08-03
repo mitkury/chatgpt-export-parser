@@ -96,7 +96,7 @@ function parseConversation(conversation: ConversationExport): ParsedConversation
   };
 }
 
-function buildMessageTree(conversation: ConversationExport): MessageTree | undefined {
+export function buildMessageTree(conversation: ConversationExport): MessageTree | undefined {
   const messages = getConversationMessages(conversation);
   const treeMap = new Map<string, MessageTree>();
   
@@ -150,7 +150,7 @@ function buildMessageTree(conversation: ConversationExport): MessageTree | undef
   return rootNodes.length > 0 ? rootNodes[0] : undefined;
 }
 
-function identifyBranches(messages: ParsedMessage[], mapping: Record<string, MessageNode>): ConversationBranch[] {
+export function identifyBranches(messages: ParsedMessage[], mapping: Record<string, MessageNode>): ConversationBranch[] {
   const branches: ConversationBranch[] = [];
   const messageMap = new Map(messages.map(msg => [msg.id, msg]));
   
@@ -203,7 +203,7 @@ function identifyBranches(messages: ParsedMessage[], mapping: Record<string, Mes
   return branches;
 }
 
-function getConversationMessages(conversation: ConversationExport): ParsedMessage[] {
+export function getConversationMessages(conversation: ConversationExport): ParsedMessage[] {
   const messages: ParsedMessage[] = [];
   const visited = new Set<string>();
   

@@ -1,7 +1,9 @@
 import { describe, it, expect } from 'vitest';
 import { parseExport } from './parser';
-import type { MessageTree } from './types';
+import { getConversationMessages, buildMessageTree, identifyBranches } from './parser';
+import { validateConversations } from './schema';
 import { getTestArchivePath } from './test-config';
+import { MessageTree } from './types';
 
 describe('parseExport', () => {
   it('should parse a ChatGPT export archive', async () => {
@@ -373,5 +375,110 @@ describe('parseExport', () => {
     
     console.log(`Found ${conversationsWithMapping.length} conversations with original mapping`);
     expect(conversationsWithMapping.length).toBeGreaterThan(0);
+  });
+}); 
+
+describe('Example conversation with branch', () => {
+  it('should parse branched conversation correctly', async () => {
+    // Read the example conversation
+    const fs = require('fs');
+    const rawData = JSON.parse(fs.readFileSync('./example-conversation.json', 'utf8'));
+    
+    // Validate the data
+    const conversations = validateConversations(rawData) as any;
+    expect(conversations).toHaveLength(1);
+    
+    const conversation = conversations[0];
+    
+    // Test basic conversation properties
+    expect(conversation.id).toBe('conv-123');
+    expect(conversation.title).toBe('Sample conversation with branch');
+    expect(conversation.current_node).toBe('msg-6');
+    expect(conversation.is_archived).toBe(false);
+    
+    // Test message parsing
+    const messages = getConversationMessages(conversation as any);
+    expect(messages).toHaveLength(6);
+    
+    // Test message order and roles
+    expect(messages[0].role).toBe('system');
+    expect(messages[1].role).toBe('user');
+    expect(messages[2].role).toBe('assistant');
+    expect(messages[3].role).toBe('user');
+    expect(messages[4].role).toBe('user');
+    expect(messages[5].role).toBe('assistant');
+    
+    // Test parent-child relationships
+    expect(messages[0].parentId).toBeUndefined(); // Root node
+    expect(messages[1].parentId).toBe('msg-1');
+    expect(messages[2].parentId).toBe('msg-2');
+    expect(messages[3].parentId).toBe('msg-3');
+    expect(messages[4].parentId).toBe('msg-3');
+    expect(messages[5].parentId).toBe('msg-4');
+    
+    // Test children relationships
+    expect(messages[0].childrenIds).toEqual(['msg-2']);
+    expect(messages[1].childrenIds).toEqual(['msg-3']);
+    expect(messages[2].childrenIds).toEqual(['msg-4', 'msg-5']); // Branch point
+    expect(messages[3].childrenIds).toEqual(['msg-6']);
+    expect(messages[4].childrenIds).toEqual([]); // Abandoned branch
+    expect(messages[5].childrenIds).toEqual([]); // End of active branch
+    
+    // Test tree structure
+    const tree = buildMessageTree(conversation as any);
+    expect(tree).toBeDefined();
+    expect(tree!.id).toBe('msg-1');
+    expect(tree!.children).toHaveLength(1);
+    
+    // Test that the tree shows the branch
+    const assistantNode = tree!.children[0].children[0]; // msg-3
+    expect(assistantNode.children).toHaveLength(2); // Two branches
+    
+    // Test branch identification
+    const branches = identifyBranches(messages, conversation.mapping as any);
+    expect(branches.length).toBeGreaterThan(0);
+    
+    // Test that we can find the main branch (the one with more messages)
+    const mainBranch = branches.find(b => b.messages.length > 1);
+    expect(mainBranch).toBeDefined();
+    
+    // Test that main branch leads to current_node
+    const lastMessage = mainBranch!.messages[mainBranch!.messages.length - 1];
+    expect(lastMessage.id).toBe('msg-6');
+    
+    // Test that all messages are included in the branch
+    expect(mainBranch!.messages).toHaveLength(6);
+  });
+  
+  it('should handle content parts correctly', async () => {
+    const fs = require('fs');
+    const rawData = JSON.parse(fs.readFileSync('./example-conversation.json', 'utf8'));
+    const conversations = validateConversations(rawData) as any;
+    const conversation = conversations[0];
+    const messages = getConversationMessages(conversation as any);
+    
+    // Test content extraction
+    expect(messages[1].content).toBe('Hello! Can you help me with a programming question?');
+    expect(messages[2].content).toBe("Of course! I'd be happy to help with your programming question. What would you like to know?");
+    expect(messages[3].content).toBe('How do I write a function in JavaScript?');
+    expect(messages[4].content).toBe('Actually, can you help me with Python instead?');
+    expect(messages[5].content).toContain('Here\'s how to write a function in JavaScript:');
+    expect(messages[5].content).toContain('```javascript');
+  });
+  
+  it('should preserve metadata correctly', async () => {
+    const fs = require('fs');
+    const rawData = JSON.parse(fs.readFileSync('./example-conversation.json', 'utf8'));
+    const conversations = validateConversations(rawData) as any;
+    const conversation = conversations[0];
+    const messages = getConversationMessages(conversation as any);
+    
+    // Test assistant message metadata
+    const assistantMessage = messages.find(m => m.role === 'assistant' && m.id === 'msg-6');
+    expect(assistantMessage).toBeDefined();
+    expect(assistantMessage!.metadata).toHaveProperty('model_slug');
+    expect(assistantMessage!.metadata).toHaveProperty('finish_details');
+    expect((assistantMessage!.metadata as any).model_slug).toBe('gpt-4');
+    expect((assistantMessage!.metadata as any).finish_details.type).toBe('stop');
   });
 }); 

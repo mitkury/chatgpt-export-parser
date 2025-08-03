@@ -1,0 +1,171 @@
+[
+  {
+    "id": "conv-123",
+    "title": "Sample conversation with branch",
+    "create_time": 1704067200,
+    "update_time": 1704067500,
+    "current_node": "msg-6",
+    "is_archived": false,
+    "moderation_results": [],
+    "mapping": {
+      "msg-1": {
+        "id": "msg-1",
+        "parent": null,
+        "children": ["msg-2"],
+        "message": {
+          "id": "msg-1",
+          "author": {
+            "role": "system",
+            "name": null,
+            "metadata": {}
+          },
+          "create_time": 1704067200,
+          "update_time": null,
+          "content": {
+            "content_type": "text",
+            "parts": [""]
+          },
+          "status": "finished",
+          "end_turn": true,
+          "weight": 1,
+          "metadata": {},
+          "recipient": "all"
+        }
+      },
+      "msg-2": {
+        "id": "msg-2",
+        "parent": "msg-1",
+        "children": ["msg-3"],
+        "message": {
+          "id": "msg-2",
+          "author": {
+            "role": "user",
+            "name": null,
+            "metadata": {}
+          },
+          "create_time": 1704067300,
+          "update_time": null,
+          "content": {
+            "content_type": "text",
+            "parts": ["Hello! Can you help me with a programming question?"]
+          },
+          "status": "finished",
+          "end_turn": true,
+          "weight": 1,
+          "metadata": {},
+          "recipient": "all"
+        }
+      },
+      "msg-3": {
+        "id": "msg-3",
+        "parent": "msg-2",
+        "children": ["msg-4", "msg-5"],
+        "message": {
+          "id": "msg-3",
+          "author": {
+            "role": "assistant",
+            "name": null,
+            "metadata": {}
+          },
+          "create_time": 1704067350,
+          "update_time": null,
+          "content": {
+            "content_type": "text",
+            "parts": ["Of course! I'd be happy to help with your programming question. What would you like to know?"]
+          },
+          "status": "finished",
+          "end_turn": true,
+          "weight": 1,
+          "metadata": {
+            "model_slug": "gpt-4",
+            "finish_details": {
+              "type": "stop"
+            }
+          },
+          "recipient": "all"
+        }
+      },
+      "msg-4": {
+        "id": "msg-4",
+        "parent": "msg-3",
+        "children": ["msg-6"],
+        "message": {
+          "id": "msg-4",
+          "author": {
+            "role": "user",
+            "name": null,
+            "metadata": {}
+          },
+          "create_time": 1704067400,
+          "update_time": null,
+          "content": {
+            "content_type": "text",
+            "parts": ["How do I write a function in JavaScript?"]
+          },
+          "status": "finished",
+          "end_turn": true,
+          "weight": 1,
+          "metadata": {},
+          "recipient": "all"
+        }
+      },
+      "msg-5": {
+        "id": "msg-5",
+        "parent": "msg-3",
+        "children": [],
+        "message": {
+          "id": "msg-5",
+          "author": {
+            "role": "user",
+            "name": null,
+            "metadata": {}
+          },
+          "create_time": 1704067450,
+          "update_time": null,
+          "content": {
+            "content_type": "text",
+            "parts": ["Actually, can you help me with Python instead?"]
+          },
+          "status": "finished",
+          "end_turn": true,
+          "weight": 1,
+          "metadata": {},
+          "recipient": "all"
+        }
+      },
+      "msg-6": {
+        "id": "msg-6",
+        "parent": "msg-4",
+        "children": [],
+        "message": {
+          "id": "msg-6",
+          "author": {
+            "role": "assistant",
+            "name": null,
+            "metadata": {}
+          },
+          "create_time": 1704067500,
+          "update_time": null,
+          "content": {
+            "content_type": "text",
+            "parts": ["Here's how to write a function in JavaScript:\n\n```javascript\nfunction greet(name) {\n  return `Hello, ${name}!`;\n}\n\n// Or using arrow function:\nconst greet = (name) => `Hello, ${name}!`;\n```"]
+          },
+          "status": "finished",
+          "end_turn": true,
+          "weight": 1,
+          "metadata": {
+            "model_slug": "gpt-4",
+            "finish_details": {
+              "type": "stop"
+            }
+          },
+          "recipient": "all"
+        }
+      }
+    },
+    "plugin_ids": null,
+    "conversation_template_id": null,
+    "gizmo_id": null,
+    "safe_urls": []
+  }
+] 
