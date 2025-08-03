@@ -2,7 +2,7 @@
 
 Turn **ChatGPT data‑export ZIPs** into easy‑to‑use JavaScript objects with full support for branched conversations.
 
-> **Status:** ✅ Production Ready — Successfully parses ChatGPT export archives with comprehensive branch handling, Zod validation, and TypeScript support.
+> **Status:** ✅ **Production Ready** — Handles all ChatGPT export features including branched conversations, tool messages, and runtime validation.
 
 ---
 
@@ -12,16 +12,16 @@ OpenAI's export gives you a single ZIP with `conversations.json`, files, feedbac
 
 * `conversations[]` – list of chats (title, timestamps, id…).
 * `conversation.messages[]` – ordered turns (`user` / `assistant` / `system` / `tool`).
-* **Branched conversations** – full tree structure with parent-child relationships.
-* **Runtime validation** – Zod schemas ensure data integrity.
+* `conversation.messageTree` – hierarchical tree structure for branched conversations.
+* `conversation.branches[]` – identified conversation branches and their relationships.
 * Attachments & safe URLs (when present).
 
-All as plain JS objects or typed data (TS). Perfect for analysis, search, re‑publishing your own archive, or importing into alternative ChatGPT clients.
+All as plain JS objects or typed data (TS). Perfect for analysis, search, or re‑publishing your own archive.
 
 ## Install
 
 ```bash
-npm install chatgpt-export-parser
+npm install chatgpt-export-parser  # package name TBD
 ```
 
 ## Quick start
@@ -30,37 +30,28 @@ npm install chatgpt-export-parser
 import { parseExport } from 'chatgpt-export-parser';
 
 const data = await parseExport('ChatGPT-data.zip');
-
-// Simple: Access all messages as flat array
-const conversation = data.conversations[0];
-console.log(`${conversation.messages.length} messages`);
-
-// Advanced: Work with conversation tree
-const tree = conversation.messageTree;
-console.log(`Tree has ${tree.children.length} branches`);
+console.log(data.conversations[0].messages);
 ```
 
 ## API
 
-### Core Functions
+| function                           | purpose                       |                                              |
+| ---------------------------------- | ----------------------------- | -------------------------------------------- |
+| `parseExport(zipPath \| Buffer)`   | returns `{ conversations, files, metadata }` |
+| `splitLargeJson(jsonPath, outDir)` | helper to shard huge archives |                                              |
+| `toMarkdown(conversation)`         | convert a chat to MD          |                                              |
 
-| Function | Purpose | Returns |
-|----------|---------|---------|
-| `parseExport(zipPath)` | Parse ChatGPT export archive | `ExportData` |
-| `validateConversations(data)` | Validate conversation data | `ConversationExport[]` |
-| `validateUser(data)` | Validate user metadata | `UserData` |
-
-### Return Types
+### Types
 
 ```typescript
 interface ExportData {
   conversations: ParsedConversation[];
   files: string[];
   metadata: {
-    user?: UserData;
-    messageFeedback?: MessageFeedback[];
-    modelComparisons?: ModelComparison[];
-    sharedConversations?: SharedConversation[];
+    user?: any;
+    messageFeedback?: any;
+    modelComparisons?: any;
+    sharedConversations?: any;
   };
 }
 
@@ -69,14 +60,10 @@ interface ParsedConversation {
   title: string | null;
   createTime: Date;
   updateTime: Date;
-  // Flat array of all messages (current branch + all branches)
-  messages: ParsedMessage[];
-  // Tree structure for advanced branch handling
-  messageTree?: MessageTree;
-  // Branch information
-  branches?: ConversationBranch[];
-  // Original mapping for advanced use cases
-  originalMapping?: Record<string, MessageNode>;
+  messages: ParsedMessage[];           // Flat array of all messages
+  messageTree?: MessageTree;           // Hierarchical tree structure
+  branches?: ConversationBranch[];     // Identified conversation branches
+  originalMapping?: Record<string, MessageNode>; // Original ChatGPT mapping
   isArchived: boolean;
   safeUrls: string[];
 }
@@ -87,10 +74,9 @@ interface ParsedMessage {
   content: string;
   createTime: Date;
   metadata: Record<string, unknown>;
-  // Branching information
-  parentId?: string;
-  childrenIds?: string[];
-  branchId?: string;
+  parentId?: string;                   // Parent message ID
+  childrenIds?: string[];              // Child message IDs
+  branchId?: string;                   // Branch this message belongs to
 }
 
 interface MessageTree {
@@ -115,119 +101,78 @@ interface ConversationBranch {
 
 ### Basic Usage
 
-```js
+```typescript
 import { parseExport } from 'chatgpt-export-parser';
 
-async function analyzeMyChats() {
-  const data = await parseExport('./my-chatgpt-export.zip');
-  
-  console.log(`Found ${data.conversations.length} conversations`);
-  
-  // Find longest conversation
-  const longest = data.conversations.reduce((a, b) => 
-    a.messages.length > b.messages.length ? a : b
-  );
-  
-  console.log(`Longest conversation: "${longest.title}" with ${longest.messages.length} messages`);
-  
-  // Get all user messages
-  const userMessages = longest.messages.filter(msg => msg.role === 'user');
-  console.log(`You sent ${userMessages.length} messages in this conversation`);
-}
+const data = await parseExport('ChatGPT-data.zip');
+
+// Access all conversations
+data.conversations.forEach(conv => {
+  console.log(`Conversation: ${conv.title}`);
+  console.log(`Messages: ${conv.messages.length}`);
+  console.log(`Branches: ${conv.branches?.length || 0}`);
+});
 ```
 
-### Working with Branched Conversations
+### Branched Conversations
 
-```js
-import { parseExport } from 'chatgpt-export-parser';
+```typescript
+// Get all messages including branches
+const conversation = data.conversations[0];
 
-async function exploreBranches() {
-  const data = await parseExport('./my-chatgpt-export.zip');
-  
-  // Find conversations with branches
-  const branchedConversations = data.conversations.filter(conv => 
-    conv.messageTree && conv.messageTree.children.length > 0
-  );
-  
-  console.log(`Found ${branchedConversations.length} conversations with branches`);
-  
-  // Traverse conversation tree
-  const traverseTree = (node) => {
-    console.log(`${node.message.role}: ${node.message.content.substring(0, 50)}...`);
-    node.children.forEach(traverseTree);
-  };
-  
-  branchedConversations.forEach(conv => {
-    console.log(`\nConversation: "${conv.title}"`);
-    traverseTree(conv.messageTree);
-  });
-}
+// Flat array of all messages (current + branches)
+conversation.messages.forEach(msg => {
+  console.log(`${msg.role}: ${msg.content}`);
+  if (msg.parentId) {
+    console.log(`  Parent: ${msg.parentId}`);
+  }
+});
+
+// Tree structure for advanced navigation
+const tree = conversation.messageTree;
+const traverseTree = (node: MessageTree) => {
+  console.log(`${node.message.role}: ${node.message.content}`);
+  node.children.forEach(traverseTree);
+};
+traverseTree(tree);
+
+// Branch information
+conversation.branches?.forEach(branch => {
+  console.log(`Branch ${branch.id}: ${branch.messages.length} messages`);
+  console.log(`  Time: ${branch.startTime} to ${branch.endTime}`);
+});
 ```
 
-### Advanced: Working with Original Mapping
+### Original Mapping Access
 
-```js
-import { parseExport } from 'chatgpt-export-parser';
-
-async function advancedAnalysis() {
-  const data = await parseExport('./my-chatgpt-export.zip');
-  
-  const conversation = data.conversations[0];
-  
-  // Access original ChatGPT mapping structure
-  const mapping = conversation.originalMapping;
-  
-  // Find all nodes with multiple children (branch points)
-  const branchPoints = Object.values(mapping).filter(node => 
-    node.children && node.children.length > 1
-  );
-  
-  console.log(`Found ${branchPoints.length} branch points in conversation`);
-}
+```typescript
+// Access the original ChatGPT mapping structure
+const originalMapping = conversation.originalMapping;
+Object.entries(originalMapping).forEach(([id, node]) => {
+  console.log(`Node ${id}:`);
+  console.log(`  Parent: ${node.parent || 'none'}`);
+  console.log(`  Children: ${node.children.length}`);
+  if (node.message) {
+    console.log(`  Role: ${node.message.author.role}`);
+  }
+});
 ```
-
-## Features
-
-### ✅ **Comprehensive Branch Support**
-- **Flat arrays** for simple processing
-- **Tree structures** for advanced branch handling
-- **Parent-child relationships** preserved
-- **Virtual root nodes** for multiple conversation roots
-
-### ✅ **Runtime Validation**
-- **Zod schemas** ensure data integrity
-- **Detailed error messages** for debugging
-- **Type safety** throughout the API
-
-### ✅ **Full Fidelity**
-- **All message types** (user, assistant, system, tool)
-- **Rich metadata** preserved
-- **Original mapping** accessible
-- **Safe URLs** and attachments
-
-### ✅ **Production Ready**
-- **TypeScript support** with full type definitions
-- **Comprehensive tests** with real ChatGPT exports
-- **Error handling** for malformed data
-- **Performance optimized** for large exports
 
 ## Development
 
 ```bash
 npm install
-npm test          # Run tests
-npm run test:run  # Run tests without watch mode
-npm run build     # Build TypeScript
+npm run build
+npm test
 ```
 
 ## Roadmap
 
-* [x] Basic ZIP parsing and conversation extraction
-* [x] TypeScript types and interfaces
-* [x] Message reconstruction from mapping tree
-* [x] **Branched conversation support**
-* [x] **Runtime validation with Zod**
-* [x] **Tree structure for advanced use cases**
+* [x] ✅ Basic parser for ChatGPT exports
+* [x] ✅ Zod runtime validation
+* [x] ✅ Branched conversation support
+* [x] ✅ Tree structure and branch identification
+* [x] ✅ TypeScript types and exports
 * [ ] Stream parser for >1 GB exports
 * [ ] CLI (`chatgpt-export <zip> --markdown`)
 * [ ] Project‑aware grouping once OpenAI exposes it
@@ -239,4 +184,4 @@ PRs welcome! Drop issues if the schema shifts.
 
 ## License
 
-MIT (or similar) – see `LICENSE` file.
+MIT - see `LICENSE` file.
