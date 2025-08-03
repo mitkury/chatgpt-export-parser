@@ -1,23 +1,37 @@
 {
   "name": "chatgpt-export-parser",
   "version": "0.1.0",
-  "description": "Parse ChatGPT export archives into JavaScript objects",
+  "description": "Parse ChatGPT export archives into JavaScript objects with full support for branched conversations",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
-    "build": "tsc",
+    "clean": "rm -rf dist",
+    "build": "npm run clean && tsc",
     "test": "vitest",
     "test:run": "vitest run",
-    "dev": "vitest --watch"
+    "dev": "vitest --watch",
+    "prepare": "npm run build"
   },
   "keywords": [
     "chatgpt",
     "export",
     "parser",
-    "conversations"
+    "conversations",
+    "branched",
+    "conversation",
+    "archive",
+    "zip"
   ],
-  "author": "",
+  "author": "Dmitry Kury (d@dkury.com)",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mitkury/chatgpt-export-parser.git"
+  },
+  "homepage": "https://github.com/mitkury/chatgpt-export-parser#readme",
+  "bugs": {
+    "url": "https://github.com/mitkury/chatgpt-export-parser/issues"
+  },
   "devDependencies": {
     "@types/node": "^20.0.0",
     "typescript": "^5.0.0",
@@ -29,6 +43,8 @@
     "zod": "^4.0.14"
   },
   "files": [
-    "dist/**/*"
+    "dist/**/*",
+    "README.md",
+    "LICENSE"
   ]
 }
