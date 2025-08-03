@@ -1,9 +1,9 @@
 import { describe, it, expect } from 'vitest';
-import { parseExport } from './parser';
-import { getConversationMessages, buildMessageTree, identifyBranches } from './parser';
-import { validateConversations } from './schema';
-import { getTestArchivePath } from './test-config';
-import { MessageTree } from './types';
+import { parseExport } from '../src/parser';
+import { getConversationMessages, buildMessageTree, identifyBranches } from '../src/parser';
+import { validateConversations } from '../src/schema';
+import { getTestArchivePath } from '../src/test-config';
+import { MessageTree } from '../src/types';
 
 describe('parseExport', () => {
   it('should parse a ChatGPT export archive', async () => {
@@ -382,7 +382,7 @@ describe('Example conversation with branch', () => {
   it('should parse branched conversation correctly', async () => {
     // Read the example conversation
     const fs = require('fs');
-    const rawData = JSON.parse(fs.readFileSync('./example-conversation.json', 'utf8'));
+    const rawData = JSON.parse(fs.readFileSync('./tests/example-conversation.json', 'utf8'));
     
     // Validate the data
     const conversations = validateConversations(rawData) as any;
@@ -452,7 +452,7 @@ describe('Example conversation with branch', () => {
   
   it('should handle content parts correctly', async () => {
     const fs = require('fs');
-    const rawData = JSON.parse(fs.readFileSync('./example-conversation.json', 'utf8'));
+    const rawData = JSON.parse(fs.readFileSync('./tests/example-conversation.json', 'utf8'));
     const conversations = validateConversations(rawData) as any;
     const conversation = conversations[0];
     const messages = getConversationMessages(conversation as any);
@@ -468,7 +468,7 @@ describe('Example conversation with branch', () => {
   
   it('should preserve metadata correctly', async () => {
     const fs = require('fs');
-    const rawData = JSON.parse(fs.readFileSync('./example-conversation.json', 'utf8'));
+    const rawData = JSON.parse(fs.readFileSync('./tests/example-conversation.json', 'utf8'));
     const conversations = validateConversations(rawData) as any;
     const conversation = conversations[0];
     const messages = getConversationMessages(conversation as any);
