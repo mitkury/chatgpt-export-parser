@@ -4,6 +4,8 @@
   "sources": [
     "README.md",
     "docs/dev/rules.md",
+    "docs/chatgpt-data-export-format.md",
+    "docs/zod.md",
     "TODO-AI.md"
   ],
   "output": {
