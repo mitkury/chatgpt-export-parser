@@ -23,7 +23,7 @@ export interface MessageNode {
 export interface MessageContent {
   id: string;
   author: {
-    role: "user" | "assistant" | "system";
+    role: "user" | "assistant" | "system" | "tool";
     name: string | null;
     metadata: Record<string, any>;
   };
@@ -52,7 +52,7 @@ export interface ParsedConversation {
 
 export interface ParsedMessage {
   id: string;
-  role: "user" | "assistant" | "system";
+  role: "user" | "assistant" | "system" | "tool";
   content: string;
   createTime: Date;
   metadata: Record<string, any>;
