@@ -27,7 +27,7 @@ export interface MessageContent {
     name: string | null | undefined;
     metadata: Record<string, unknown>;
   };
-  create_time: number;
+  create_time: number | null;
   update_time: number | null | undefined;
   content: {
     content_type: string;
@@ -40,22 +40,50 @@ export interface MessageContent {
   recipient?: string;
 }
 
-export interface ParsedConversation {
-  id: string;
-  title: string;
-  createTime: Date;
-  updateTime: Date;
-  messages: ParsedMessage[];
-  isArchived: boolean;
-  safeUrls: string[];
-}
-
 export interface ParsedMessage {
   id: string;
   role: "user" | "assistant" | "system" | "tool";
   content: string;
   createTime: Date;
-  metadata: Record<string, any>;
+  metadata: Record<string, unknown>;
+  // Branching information
+  parentId?: string;
+  childrenIds?: string[];
+  branchId?: string; // To group related messages in a branch
+}
+
+export interface ConversationBranch {
+  id: string;
+  messages: ParsedMessage[];
+  startTime: Date;
+  endTime: Date;
+  parentBranchId?: string;
+  childrenBranchIds: string[];
+}
+
+export interface MessageTree {
+  id: string;
+  message: ParsedMessage;
+  parent?: MessageTree;
+  children: MessageTree[];
+  branchId: string;
+}
+
+export interface ParsedConversation {
+  id: string;
+  title: string | null;
+  createTime: Date;
+  updateTime: Date;
+  // Flat array of all messages (current branch + all branches)
+  messages: ParsedMessage[];
+  // Tree structure for advanced branch handling
+  messageTree?: MessageTree;
+  // Branch information
+  branches?: ConversationBranch[];
+  // Original mapping for advanced use cases
+  originalMapping?: Record<string, MessageNode>;
+  isArchived: boolean;
+  safeUrls: string[];
 }
 
 export interface ExportData {

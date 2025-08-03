@@ -5,7 +5,9 @@ export type {
   ParsedMessage,
   ConversationExport,
   MessageNode,
-  MessageContent
+  MessageContent,
+  MessageTree,
+  ConversationBranch
 } from './types';
 
 // Zod schemas for validation

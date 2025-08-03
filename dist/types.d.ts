@@ -25,7 +25,7 @@ export interface MessageContent {
         name: string | null | undefined;
         metadata: Record<string, unknown>;
     };
-    create_time: number;
+    create_time: number | null;
     update_time: number | null | undefined;
     content: {
         content_type: string;
@@ -37,21 +37,42 @@ export interface MessageContent {
     metadata: Record<string, unknown>;
     recipient?: string;
 }
-export interface ParsedConversation {
-    id: string;
-    title: string;
-    createTime: Date;
-    updateTime: Date;
-    messages: ParsedMessage[];
-    isArchived: boolean;
-    safeUrls: string[];
-}
 export interface ParsedMessage {
     id: string;
     role: "user" | "assistant" | "system" | "tool";
     content: string;
     createTime: Date;
-    metadata: Record<string, any>;
+    metadata: Record<string, unknown>;
+    parentId?: string;
+    childrenIds?: string[];
+    branchId?: string;
+}
+export interface ConversationBranch {
+    id: string;
+    messages: ParsedMessage[];
+    startTime: Date;
+    endTime: Date;
+    parentBranchId?: string;
+    childrenBranchIds: string[];
+}
+export interface MessageTree {
+    id: string;
+    message: ParsedMessage;
+    parent?: MessageTree;
+    children: MessageTree[];
+    branchId: string;
+}
+export interface ParsedConversation {
+    id: string;
+    title: string | null;
+    createTime: Date;
+    updateTime: Date;
+    messages: ParsedMessage[];
+    messageTree?: MessageTree;
+    branches?: ConversationBranch[];
+    originalMapping?: Record<string, MessageNode>;
+    isArchived: boolean;
+    safeUrls: string[];
 }
 export interface ExportData {
     conversations: ParsedConversation[];
